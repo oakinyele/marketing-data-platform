@@ -1,0 +1,43 @@
+version: 2
+
+models:
+  - name: int_marketing_ads
+    description: >
+      Unified Facebook and Snapchat advertising performance data enriched
+      with available ad, ad group, campaign and account metadata.
+      Facebook records are at ad-date grain. Snapchat records are at
+      ad-date-country grain. Spend remains in the original source currency.
+
+    columns:
+      - name: platform
+        description: "Advertising platform that produced the performance record."
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['facebook', 'snapchat']
+
+      - name: ad_id
+        description: "Platform-specific advertising identifier."
+        data_tests:
+          - not_null
+
+      - name: ad_date
+        description: "Date on which advertising performance was recorded."
+        data_tests:
+          - not_null
+
+      - name: spend
+        description: "Advertising spend in the source currency."
+        data_tests:
+          - non_negative
+
+      - name: impressions
+        description: "Number of impressions; may be null if the source value was missing."
+        data_tests:
+          - non_negative
+
+      - name: clicks
+        description: "Number of clicks; may be null if the source value was missing."
+        data_tests:
+          - non_negative

@@ -1,0 +1,57 @@
+name: dbt CI
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+
+    env:
+      # Placeholders are sufficient for parsing; this job does not connect to Databricks.
+      DATABRICKS_HOST: "placeholder.invalid"
+      DATABRICKS_HTTP_PATH: "/sql/1.0/warehouses/ci-placeholder"
+      DATABRICKS_TOKEN: "ci-placeholder"
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+
+      - name: Install dbt and Databricks adapter
+        run: uv pip install --system "dbt-databricks>=1.12.5,<2.0"
+
+      - name: Create CI-only dbt profile
+        run: |
+          mkdir -p ~/.dbt
+          cat > ~/.dbt/profiles.yml <<'EOF'
+          marketing_data_platform:
+            target: dev
+            outputs:
+              dev:
+                type: databricks
+                catalog: workspace
+                schema: marketing_dev
+                host: "{{ env_var('DATABRICKS_HOST') }}"
+                http_path: "{{ env_var('DATABRICKS_HTTP_PATH') }}"
+                token: "{{ env_var('DATABRICKS_TOKEN') }}"
+                threads: 4
+          EOF
+
+      - name: Install dbt packages
+        run: dbt deps
+
+      - name: Validate dbt project
+        run: dbt parse

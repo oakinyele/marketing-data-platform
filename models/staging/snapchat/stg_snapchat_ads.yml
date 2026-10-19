@@ -1,0 +1,26 @@
+
+version: 2
+
+models:
+  - name: stg_snapchat_ads
+    description: >
+      Cleaned Snapchat Ads metadata with standardized ad and ad group
+      identifiers, ad name, and update timestamp.
+
+    columns:
+      - name: ad_id
+        description: "Identifier of the Snapchat ad."
+        data_tests:
+          - not_null
+          - unique
+
+      - name: ad_group_id
+        description: "Identifier of the ad group associated with the ad."
+        data_tests:
+          - not_null
+
+      - name: ad_name
+        description: "Name of the Snapchat ad."
+
+      - name: ad_updated_at
+        description: "Timestamp when the ad detail was last updated."

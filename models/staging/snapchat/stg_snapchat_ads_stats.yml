@@ -1,0 +1,48 @@
+
+version: 2
+
+models:
+  - name: stg_snapchat_ads_stats
+    description: >
+      Cleaned Snapchat Ads performance statistics at the grain of one
+      ad detail per reporting date per country. Standardizes metric types
+      and converts literal 'null' click values to SQL NULL.
+
+    columns:
+      - name: ad_id
+        description: "Identifier of the Snapchat ad detail."
+        data_tests:
+          - not_null
+
+      - name: ad_date
+        description: "Date on which performance was reported."
+        data_tests:
+          - not_null
+
+      - name: country
+        description: "Country associated with the performance record."
+        data_tests:
+          - not_null
+
+      - name: spend
+        description: "Advertising spend for the ad, date, and country."
+        data_tests:
+          - non_negative
+
+      - name: impressions
+        description: "Number of impressions for the ad, date, and country."
+        data_tests:
+          - non_negative
+
+      - name: clicks
+        description: "Number of clicks, or NULL when the source value is missing."
+        data_tests:
+          - non_negative
+
+    data_tests:
+      - unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - ad_id
+              - ad_date
+              - country

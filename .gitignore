@@ -1,0 +1,21 @@
+
+target/
+dbt_packages/
+logs/
+.env
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+
+# dbt and local credentials
+.user.yml
+profiles.yml
+
+# Environment and secrets
+.env.*
+!.env.example
+
+# OS files
+.DS_Store

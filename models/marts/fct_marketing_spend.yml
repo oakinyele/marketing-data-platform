@@ -1,0 +1,87 @@
+version: 2
+
+models:
+  - name: fct_marketing_spend
+    description: >
+      Unified marketing performance fact model for Facebook and Snapchat.
+      Facebook grain is one ad per day; Snapchat grain is one ad per day
+      per country. Spend is expressed in the original source currency.
+      CTR is clicks divided by impressions, CPC is spend divided by clicks,
+      and CPM is spend per 1,000 impressions. Calculated metrics are null
+      when their denominator is zero or missing.
+
+    data_tests:
+      - marketing_grain
+
+    columns:
+      - name: platform
+        description: "Advertising platform."
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['facebook', 'snapchat']
+
+      - name: ad_id
+        description: "Platform-specific ad identifier."
+        data_tests:
+          - not_null
+
+      - name: ad_name
+        description: "Name of the advertisement."
+
+      - name: ad_group_id
+        description: "Platform-specific ad group identifier."
+
+      - name: ad_group_name
+        description: "Name of the ad group."
+
+      - name: campaign_id
+        description: "Platform-specific campaign identifier."
+
+      - name: campaign_name
+        description: "Name of the campaign."
+
+      - name: account_id
+        description: "Advertising account identifier."
+
+      - name: account_name
+        description: "Advertising account name; may be unavailable for Snapchat."
+
+      - name: currency_code
+        description: "Currency reported by the source platform."
+
+      - name: ad_date
+        description: "Date of the advertising performance."
+        data_tests:
+          - not_null
+
+      - name: country
+        description: "Country associated with Snapchat performance; null for Facebook."
+
+      - name: data_source
+        description: "Source identifier for the performance record."
+
+      - name: spend
+        description: "Advertising spend in the original source currency."
+        data_tests:
+          - non_negative
+
+      - name: impressions
+        description: "Number of impressions; may be null when missing in source."
+        data_tests:
+          - non_negative
+
+      - name: clicks
+        description: "Number of clicks; may be null when missing in source."
+        data_tests:
+          - non_negative
+
+      - name: ctr
+        description: "Click-through rate, calculated as clicks divided by impressions; null when impressions are zero or missing."
+
+      - name: cpc
+        description: "Cost per click, calculated as spend divided by clicks; null when clicks are zero or missing."
+
+      - name: cpm
+        description: "Cost per thousand impressions, calculated as spend multiplied by 1,000 divided by impressions; null when impressions are zero or missing."

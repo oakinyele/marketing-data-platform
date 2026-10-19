@@ -1,0 +1,39 @@
+
+version: 2
+
+models:
+  - name: stg_facebook_ads
+    description: >
+      Cleaned Facebook Ads metadata, including ad, ad group, campaign,
+      and account identifiers, plus ad name, status, and update timestamp.
+
+    columns:
+      - name: ad_id
+        description: "Unique identifier of a Facebook ad."
+        data_tests:
+          - not_null
+          - unique
+
+      - name: campaign_id
+        description: "Identifier of the campaign associated with the ad."
+        data_tests:
+          - not_null
+
+      - name: ad_group_id
+        description: "Identifier of the ad group associated with the ad."
+        data_tests:
+          - not_null
+
+      - name: account_id
+        description: "Identifier of the Facebook advertising account."
+        data_tests:
+          - not_null
+
+      - name: ad_name
+        description: "Name of the Facebook ad."
+
+      - name: ad_status
+        description: "Status recorded for the Facebook ad."
+
+      - name: ad_updated_at
+        description: "Timestamp when the ad record was last updated."

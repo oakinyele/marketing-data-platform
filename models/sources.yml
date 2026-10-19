@@ -1,0 +1,24 @@
+
+version: 2
+
+sources:
+  - name: facebook
+    description: "Raw Facebook Ads data loaded into Databricks."
+    catalog: workspace
+    schema: default
+    tables:
+      - name: raw_facebook_accounts
+      - name: raw_facebook_adgroups
+      - name: raw_facebook_ads
+      - name: raw_facebook_ads_stats
+      - name: raw_facebook_campaigns
+
+  - name: snapchat
+    description: "Raw Snapchat Ads data loaded into Databricks."
+    catalog: workspace
+    schema: default
+    tables:
+      - name: raw_snapchat_adgroups
+      - name: raw_snapchat_ads
+      - name: raw_snapchat_ads_stats
+      - name: raw_snapchat_campaigns

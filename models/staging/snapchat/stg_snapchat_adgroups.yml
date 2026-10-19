@@ -1,0 +1,26 @@
+
+version: 2
+
+models:
+  - name: stg_snapchat_adgroups
+    description: >
+      Cleaned Snapchat ad group metadata. Keeps the most recently updated
+      record per ad_group_id, using surrogate_key as a tie-breaker.
+
+    columns:
+      - name: ad_group_id
+        description: "Unique identifier of the Snapchat ad group."
+        data_tests:
+          - not_null
+          - unique
+
+      - name: campaign_id
+        description: "Identifier of the campaign associated with the ad group."
+        data_tests:
+          - not_null
+
+      - name: ad_group_name
+        description: "Name of the Snapchat ad group."
+
+      - name: ad_group_updated_at
+        description: "Timestamp when the ad group record was updated."

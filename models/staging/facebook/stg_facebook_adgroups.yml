@@ -1,0 +1,22 @@
+
+version: 2
+
+models:
+  - name: stg_facebook_adgroups
+    description: >
+      Cleaned Facebook ad group metadata. Campaign relationships are
+      resolved through the Facebook ads model because the raw ad group
+      source does not contain campaign_id.
+
+    columns:
+      - name: ad_group_id
+        description: "Identifier of the Facebook ad group."
+        data_tests:
+          - not_null
+          - unique
+
+      - name: ad_group_name
+        description: "Name of the Facebook ad group."
+
+      - name: ad_group_updated_at
+        description: "Timestamp when the ad group record was last updated."

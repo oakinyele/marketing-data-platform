@@ -1,0 +1,47 @@
+
+version: 2
+
+models:
+  - name: stg_facebook_ads_stats
+    description: >
+      Cleaned Facebook Ads performance statistics at the grain of one
+      ad per reporting date. Converts spend, impressions, and clicks
+      to numeric types and normalizes literal 'null' strings to SQL NULL.
+
+    columns:
+      - name: ad_id
+        description: "Identifier of the Facebook ad."
+        data_tests:
+          - not_null
+
+      - name: account_id
+        description: "Identifier of the Facebook advertising account."
+        data_tests:
+          - not_null
+
+      - name: ad_date
+        description: "Date on which the ad performance was reported."
+        data_tests:
+          - not_null
+
+      - name: spend
+        description: "Advertising spend for the ad on the reporting date."
+        data_tests:
+          - non_negative
+
+      - name: impressions
+        description: "Number of impressions, or NULL when the source value is missing."
+        data_tests:
+          - non_negative
+
+      - name: clicks
+        description: "Number of clicks, or NULL when the source value is missing."
+        data_tests:
+          - non_negative
+
+    data_tests:
+      - unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - ad_id
+              - ad_date

@@ -1,0 +1,26 @@
+version: 2
+
+models:
+  - name: stg_facebook_accounts
+    description: >
+      Cleaned Facebook account metadata with standardized column names
+      and data types.
+
+    columns:
+      - name: account_id
+        description: "Unique identifier for a Facebook advertising account."
+        data_tests:
+          - not_null
+          - unique
+
+      - name: account_name
+        description: "Name of the Facebook advertising account."
+
+      - name: currency_code
+        description: "Currency code used by the advertising account."
+
+      - name: account_created_at
+        description: "Timestamp when the account was created."
+
+      - name: account_updated_at
+        description: "Timestamp when the account was last updated."
