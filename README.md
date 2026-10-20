@@ -139,8 +139,14 @@ The `.env.example` file documents the intended environment-variable configuratio
 
 Production execution should use a Databricks Service Principal rather than a personal access token, with appropriately scoped Unity Catalog permissions. Development and production should use separate targets and schemas.
 
+
 ## CI/CD
 
-The GitHub Actions workflow runs dependency installation and dbt project parsing on pull requests and pushes to `main`.
+The GitHub Actions workflow automates validation and production deployment.
 
-A production-ready workflow should extend this validation with warehouse-connected builds and tests, followed by controlled production deployment. This requires protected CI credentials, Databricks Service Principal configuration, and appropriate environment permissions.
+- **Pull requests and pushes to `main`:** Install dbt dependencies and parse the project to validate its configuration and structure.
+- **Production deployment:** After a successful validation on a push to `main`, authenticate to Databricks using a Service Principal configured through GitHub Actions secrets, run `dbt debug --target prod`, build production models and tests with `dbt build --target prod --exclude elementary`, and deploy Elementary models separately.
+
+Production credentials are stored as GitHub Actions secrets and are not committed to the repository.
+
+The current pull-request validation checks project parsing rather than running warehouse-connected data tests. Production deployment performs the live dbt build and tests. This provides automated pre-merge validation, environment separation, secure production authentication, and controlled deployment.
