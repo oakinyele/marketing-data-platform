@@ -1,4 +1,5 @@
-name: dbt CI
+
+name: dbt CI and Production Deploy
 
 on:
   pull_request:
@@ -10,10 +11,10 @@ on:
 
 jobs:
   validate:
+    name: Validate dbt project
     runs-on: ubuntu-latest
 
     env:
-      # Placeholders are sufficient for parsing; this job does not connect to Databricks.
       DATABRICKS_HOST: "placeholder.invalid"
       DATABRICKS_HTTP_PATH: "/sql/1.0/warehouses/ci-placeholder"
       DATABRICKS_TOKEN: "ci-placeholder"
@@ -35,15 +36,15 @@ jobs:
 
       - name: Create CI-only dbt profile
         run: |
-          mkdir -p ~/.dbt
-          cat > ~/.dbt/profiles.yml <<'EOF'
+          mkdir -p "$HOME/.dbt"
+          cat > "$HOME/.dbt/profiles.yml" <<'EOF'
           marketing_data_platform:
             target: dev
             outputs:
               dev:
                 type: databricks
                 catalog: workspace
-                schema: marketing_dev
+                schema: marketing_ci
                 host: "{{ env_var('DATABRICKS_HOST') }}"
                 http_path: "{{ env_var('DATABRICKS_HTTP_PATH') }}"
                 token: "{{ env_var('DATABRICKS_TOKEN') }}"
@@ -55,3 +56,64 @@ jobs:
 
       - name: Validate dbt project
         run: dbt parse
+
+  deploy-production:
+    name: Deploy production
+    runs-on: ubuntu-latest
+    needs: validate
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+    env:
+      DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
+      DATABRICKS_HTTP_PATH: ${{ secrets.DATABRICKS_HTTP_PATH }}
+      DATABRICKS_CLIENT_ID: ${{ secrets.DATABRICKS_CLIENT_ID }}
+      DATABRICKS_CLIENT_SECRET: ${{ secrets.DATABRICKS_CLIENT_SECRET }}
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+
+      - name: Install dbt and Databricks adapter
+        run: uv pip install --system "dbt-databricks>=1.12.5,<2.0"
+
+      - name: Create production dbt profile
+        run: |
+          mkdir -p "$HOME/.dbt"
+          cat > "$HOME/.dbt/profiles.yml" <<'EOF'
+          marketing_data_platform:
+            target: prod
+            outputs:
+              prod:
+                type: databricks
+                catalog: workspace
+                schema: marketing_prod
+                host: "{{ env_var('DATABRICKS_HOST') }}"
+                http_path: "{{ env_var('DATABRICKS_HTTP_PATH') }}"
+                auth_type: oauth
+                client_id: "{{ env_var('DATABRICKS_CLIENT_ID') }}"
+                client_secret: "{{ env_var('DATABRICKS_CLIENT_SECRET') }}"
+                threads: 4
+                connect_retries: 3
+                connect_timeout: 60
+                retry_all: true
+          EOF
+
+      - name: Install dbt packages
+        run: dbt deps
+
+      - name: Test production connection
+        run: dbt debug --target prod
+
+      - name: Build production models
+        run: dbt build --target prod --exclude elementary
+
+      - name: Deploy Elementary models
+        run: dbt run --select elementary --target prod
