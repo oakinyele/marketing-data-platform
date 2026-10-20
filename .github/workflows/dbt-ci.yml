@@ -55,7 +55,7 @@ jobs:
         run: dbt deps
 
       - name: Validate dbt project
-        run: dbt parse
+        run: dbt parse --no-partial-parse
 
   deploy-production:
     name: Deploy production
